@@ -7,7 +7,6 @@ from datetime import datetime
 from enum import Enum
 from functools import cached_property
 from pydantic import BaseModel, Extra, Field, validator
-from pydantic.datetime_parse import parse_datetime
 from typing import Any, Optional
 
 
@@ -28,10 +27,12 @@ class NaiveDatetime(datetime):
 
     @classmethod
     def validate(cls, v):
-        v = parse_datetime(v)
-        v = v.replace(tzinfo=None)
+        if isinstance(v, str):
+            v = datetime.fromisoformat(v)
+        if v.tzinfo is not None:
+            v = v.replace(tzinfo=None)
         return v
-
+    
 
 class Sex(str, Enum):
     FEMALE = 'FEMALE'
